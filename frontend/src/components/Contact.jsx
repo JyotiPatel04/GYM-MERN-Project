@@ -12,23 +12,27 @@ const Contact = () => {
   const sendMail = async (e) => {
     e.preventDefault();
     setLoading(true);
+
     try {
-     const { data } = await axios.post(
-  "https://gym-mern-project-mkvu.onrender.com/send/mail", 
-  { name, email, message },
-  {
-    withCredentials: true,
-    headers: { "Content-Type": "application/json" },
-  }
-);
+      const { data } = await axios.post(
+        `${import.meta.env.VITE_API_URL}/send/mail`,
+        { name, email, message },
+        {
+          withCredentials: true,
+          headers: { "Content-Type": "application/json" },
+        }
+      );
+
       setName("");
       setEmail("");
       setMessage("");
       toast.success(data.message);
-      setLoading(false);
     } catch (error) {
+      toast.error(
+        error?.response?.data?.message || "Failed to send message"
+      );
+    } finally {
       setLoading(false);
-      toast.error(error.response.data.message);
     }
   };
 
@@ -36,30 +40,37 @@ const Contact = () => {
     <section className="contact">
       <form onSubmit={sendMail}>
         <h1>CONTACT US</h1>
+
         <div>
           <label>Name</label>
           <input
             type="text"
             value={name}
             onChange={(e) => setName(e.target.value)}
+            required
           />
         </div>
+
         <div>
           <label>Email</label>
           <input
             type="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
+            required
           />
         </div>
+
         <div>
           <label>Message</label>
           <input
             type="text"
             value={message}
             onChange={(e) => setMessage(e.target.value)}
+            required
           />
         </div>
+
         <button
           type="submit"
           disabled={loading}

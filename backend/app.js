@@ -3,20 +3,24 @@ import { config } from "dotenv";
 import cors from "cors";
 import { sendEmail } from "./utils/sendEmail.js";
 
+config();
+
 const app = express();
 
-config({ path: "./config.env" });
-
-app.use(
-  cors({
-    origin: [process.env.FRONTEND_URL], // Localhost hata kar ye likhein
-    methods: ["GET", "POST"],
-    credentials: true,
-  })
-);
+app.use(cors({
+  origin: [
+    "http://localhost:5173",
+    "https://gym-mern-project.vercel.app"
+  ],
+  credentials: true
+}));
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+app.get("/", (req, res) => {
+  res.send("GYM Backend Running");
+});
 
 app.post("/send/mail", async (req, res) => {
   const { name, email, message } = req.body;
@@ -41,7 +45,7 @@ app.post("/send/mail", async (req, res) => {
       message: "Message Sent Successfully.",
     });
   } catch (error) {
-    console.error("Email sending error:", error); // Error log add kiya hai
+    console.error("Email sending error:", error);
 
     return res.status(500).json({
       success: false,
